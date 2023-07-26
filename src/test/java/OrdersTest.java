@@ -1,5 +1,6 @@
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
+import org.example.OrderApi;
 import org.example.Orders;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,13 +8,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.List;
-
+import static org.apache.http.HttpStatus.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.isA;
 
 @RunWith(Parameterized.class)
 
-public class ordersTest {
+public class OrdersTest extends OrderApi {
+    final static String ORDER = "/api/v1/orders";
     private final String firstName;
     private final String lastName;
     private final String address;
@@ -25,7 +27,7 @@ public class ordersTest {
     private final List<String> color;
 
 
-    public ordersTest(String firstName, String lastName, String address, int metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> color) {
+    public OrdersTest(String firstName, String lastName, String address, int metroStation, String phone, int rentTime, String deliveryDate, String comment, List<String> color) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -62,11 +64,11 @@ public class ordersTest {
                 .and()
                 .body(orders)
                 .when()
-                .post("/api/v1/orders");
+                .post(ORDER);
 
         response.then().assertThat().body("track", isA(Integer.class))
                 .and()
-                .statusCode(201);
+                .statusCode(SC_CREATED);
 
         System.out.println(response.body().asString());
 
