@@ -15,7 +15,7 @@ import static org.hamcrest.Matchers.isA;
 @RunWith(Parameterized.class)
 
 public class OrdersTest extends OrderApi {
-    final static String ORDER = "/api/v1/orders";
+    OrderApi orderApi = new OrderApi();
     private final String firstName;
     private final String lastName;
     private final String address;
@@ -59,12 +59,7 @@ public class OrdersTest extends OrderApi {
     public void checkOrdersResponseBodyTest() {
         Orders orders = new Orders(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment);
 
-        Response response = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(orders)
-                .when()
-                .post(ORDER);
+        Response response = orderApi.newOrders(orders);
 
         response.then().assertThat().body("track", isA(Integer.class))
                 .and()

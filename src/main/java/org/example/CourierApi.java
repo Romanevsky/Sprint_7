@@ -4,53 +4,52 @@ import com.google.gson.Gson;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
-import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.isA;
 
 public class CourierApi {
-    public void Create() {
-        Courier courier = new Courier("romanyvsky", "romanev", "Roman");
-        Response response = given()
+
+    final static String COURIER = "/api/v1/courier";
+    public final static String LOGIN_COURIER = "/api/v1/courier/login";
+    static final String COURIER_S = "/api/v1/courier/%s";
+
+    public Response createCourier(Courier courier) {
+        return given()
                 .header("Content-type", "application/json")
                 .and()
                 .body(courier)
                 .when()
-                .post("/api/v1/courier");
-
-        response.then().assertThat().body("ok", equalTo(true))
-                .and()
-                .statusCode(SC_CREATED);
-        System.out.println(response.body().asString());
+                .post(COURIER);
     }
 
-    public void DeleteCourier() {
-        Courier courier = new Courier("romanyvsky", "romanev", "Roman");
+    public Response createCourierLogin(Courier courier) {
+        return given()
+                .header("Content-type", "application/json")
+                .and()
+                .body(courier)
+                .when()
+                .post(LOGIN_COURIER);
+    }
+
+    public void deleteCourier(String id) {
+
+        Response responseDelete = given()
+                .header("Content-type", "application/json")
+                .when()
+                .delete(String.format(COURIER_S, id));
+
+    }
+
+    public CourierId getCourierId(Courier courier) {
 
         Response responseLogin = given()
                 .header("Content-type", "application/json")
                 .and()
                 .body(courier)
                 .when()
-                .post("/api/v1/courier/login");
-
-        responseLogin.then().assertThat().body("id", isA(Integer.class))
-                .and()
-                .statusCode(SC_OK);
-
+                .post(CourierApi.LOGIN_COURIER);
         String IdString = responseLogin.body().asString();
         Gson gson = new Gson();
-        CourierDelete id = gson.fromJson(IdString, CourierDelete.class);
+        CourierId id = gson.fromJson(IdString, CourierId.class);
+        return id;
 
-
-        Response responseDelete = given()
-                .header("Content-type", "application/json")
-                .when()
-                .delete(String.format("/api/v1/courier/%s", id.getId()));
-
-        responseDelete.then().assertThat().body("ok", equalTo(true))
-                .and()
-                .statusCode(SC_OK);
     }
 }

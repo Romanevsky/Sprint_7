@@ -3,67 +3,58 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.example.*;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import static org.apache.http.HttpStatus.*;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.isA;
 
 public class СourierTest extends CourierApi {
-    final static String COURIER =  "/api/v1/courier";
-    final static String LOGIN_COURIER = "/api/v1/courier/login";
+
+    CourierApi courierApi;
     @Before
     public void setUp() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
+        courierApi = new CourierApi();
     }
 
     @Test
     public void checkCourierResponseBodyTest() {
-        CourierApi courierApi = new CourierApi();
-        courierApi.Create();
+
+        Courier courier = new Courier("romanyvsky", "romanev", "Roman");
+       Response response = courierApi.createCourier(courier);
+        response.then().assertThat().body("ok", equalTo(true))
+                .and()
+                .statusCode(SC_CREATED);
+        System.out.println(response.body().asString());
     }
 
     @Test
     public void checkCourierDoubleResponseBodyTest() {
         Courier courier = new Courier("romanyvsky", "romanev", "Roman");
 
-        Response response1 = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post(COURIER);
+        Response responseCreateCourier = courierApi.createCourier(courier);
 
-        response1.then().assertThat().body("ok", equalTo(true))
+        responseCreateCourier.then().assertThat().body("ok", equalTo(true))
                 .and()
                 .statusCode(SC_CREATED);
 
-        Response response2 = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(courier)
-                .when()
-                .post(COURIER);
+        Response responseCreateCourierDuplicate = courierApi.createCourier(courier);
 
-        response2.then().assertThat().body("message", equalTo("Этот логин уже используется. Попробуйте другой."))
+        responseCreateCourierDuplicate.then().assertThat().body("message", equalTo("Этот логин уже используется. Попробуйте другой."))
                 .and()
                 .statusCode(SC_CONFLICT);
 
-        System.out.println(response2.body().asString());
+        System.out.println(responseCreateCourierDuplicate.body().asString());
 
     }
 
     @Test
     public void checkCourierResponseWithoutFieldBodyTest() {
-        CourierWithoutPassword courierWithoutPassword = new CourierWithoutPassword("romanyvsky", "Roman");
+        Courier courier = new Courier("romanyvsky", null, "Roman");
 
-        Response response = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(courierWithoutPassword)
-                .when()
-                .post(COURIER);
+        Response response = courierApi.createCourier(courier);
 
         response.then().assertThat().body("message", equalTo("Недостаточно данных для создания учетной записи"))
                 .and()
@@ -75,8 +66,10 @@ public class СourierTest extends CourierApi {
 
     @After
     public void tearDown() {
-        CourierApi courierApi = new CourierApi();
-        courierApi.DeleteCourier();
+        Courier courier = new Courier("romanyvsky", "romanev", "Roman");
+
+        CourierId id = courierApi.getCourierId(courier);
+        courierApi.deleteCourier(id.getId());
 
     }
 

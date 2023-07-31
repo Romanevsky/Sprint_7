@@ -11,26 +11,18 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
 
 public class СourierLoginTest extends CourierApi {
-    final static String LOGIN_COURIER = "/api/v1/courier/login";
+    CourierApi courierApi = new CourierApi();
+    Courier courier = new Courier("romanyvsky", "romanev", null);
     @Before
     public void setUp() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
-        CourierApi courierApi = new CourierApi();
-        courierApi.Create();
+        courierApi.createCourier(courier);
     }
 
 
     @Test
     public void checkCourierLoginResponseBodyTest() {
-
-        CourierLogin courierLogin = new CourierLogin("romanyvsky", "romanev");
-
-        Response response = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(courierLogin)
-                .when()
-                .post(LOGIN_COURIER);
+        Response response = courierApi.createCourierLogin(courier);
 
         response.then().assertThat().body("id", isA(Integer.class))
                 .and()
@@ -42,14 +34,9 @@ public class СourierLoginTest extends CourierApi {
 
     @Test
     public void checkCourierLoginBadPasswordResponseBodyTest() {
-        CourierLogin courierLogin = new CourierLogin("romanyvsky", "roman");
+        Courier courier = new Courier("romanyvsky", "romanevBug", null);
 
-        Response response = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(courierLogin)
-                .when()
-                .post(LOGIN_COURIER);
+        Response response = courierApi.createCourierLogin(courier);
 
         response.then().assertThat().body("message", equalTo("Учетная запись не найдена"))
                 .and()
@@ -61,8 +48,8 @@ public class СourierLoginTest extends CourierApi {
 
     @After
     public void tearDown() {
-        CourierApi courierApi = new CourierApi();
-        courierApi.DeleteCourier();
+        CourierId id = courierApi.getCourierId(courier);
+        courierApi.deleteCourier(id.getId());
 
     }
 

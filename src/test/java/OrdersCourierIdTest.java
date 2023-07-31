@@ -1,56 +1,45 @@
 import com.google.gson.Gson;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.example.Courier;
-import org.example.CourierApi;
-import org.example.CourierDelete;
-import org.example.CourierLogin;
+import org.example.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.apache.http.HttpStatus.*;
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
 
 public class OrdersCourierIdTest {
-    final static String COURIER =  "/api/v1/courier";
-    final static String LOGIN_COURIER = "/api/v1/courier/login";
+    CourierApi courierApi = new CourierApi();
+    Courier courier = new Courier("romanyvsky", "romanev", null);
+    OrderApi orderApi = new OrderApi();
+
     @Before
     public void setUp() {
         RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru/";
-        CourierApi courierApi = new CourierApi();
-        courierApi.Create();
+        courierApi.createCourier(courier);
     }
-
 
 
     @Test
     public void checkOrdersResponseBodyTest() {
-        CourierLogin courierLogin = new CourierLogin("romanyvsky", "romanev");
+        Courier courier = new Courier("romanyvsky", "romanev", null);
 
-        Response responseLogin = given()
-                .header("Content-type", "application/json")
-                .and()
-                .body(courierLogin)
-                .when()
-                .post(LOGIN_COURIER);
+        Response response = courierApi.createCourierLogin(courier);
 
-        responseLogin.then().assertThat().body("id", isA(Integer.class))
+        response.then().assertThat().body("id", isA(Integer.class))
                 .and()
                 .statusCode(SC_OK);
 
-        String IdString = responseLogin.body().asString();
+        String idString = response.body().asString();
         Gson gson = new Gson();
-        CourierDelete id = gson.fromJson(IdString, CourierDelete.class);
+        CourierId courierId = gson.fromJson(idString, CourierId.class);
 
 
-        Response response = given()
-                .header("Content-type", "application/json")
-                .when()
-                .get(String.format("/api/v1/orders?courierId=%s", id.getId()));
+        Response responseOrder = orderApi.courierOrder(courierId.getId());
 
-        response.then().assertThat()
+        responseOrder.then().assertThat()
                 .statusCode(SC_OK);
 
         System.out.println(response.body().asString());
@@ -59,8 +48,8 @@ public class OrdersCourierIdTest {
 
     @After
     public void tearDown() {
-        CourierApi courierApi = new CourierApi();
-        courierApi.DeleteCourier();
+        CourierId id = courierApi.getCourierId(courier);
+        courierApi.deleteCourier(id.getId());
 
     }
 }
