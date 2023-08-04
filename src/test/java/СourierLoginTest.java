@@ -1,4 +1,7 @@
 import com.google.gson.Gson;
+import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.example.*;
@@ -21,6 +24,8 @@ public class СourierLoginTest extends CourierApi {
 
 
     @Test
+    @DisplayName("check Courier Login Response Body Test")
+    @Description("Применение метода /api/v1/courier/login")
     public void checkCourierLoginResponseBodyTest() {
         Response response = courierApi.createCourierLogin(courier);
 
@@ -33,9 +38,10 @@ public class СourierLoginTest extends CourierApi {
     }
 
     @Test
+    @DisplayName("check Courier Login Bad Password Response Body Test")
+    @Description("Проверка авторизации с неверным паролем с неверным")
     public void checkCourierLoginBadPasswordResponseBodyTest() {
         Courier courier = new Courier("romanyvsky", "romanevBug", null);
-
         Response response = courierApi.createCourierLogin(courier);
 
         response.then().assertThat().body("message", equalTo("Учетная запись не найдена"))

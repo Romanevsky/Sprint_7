@@ -1,3 +1,5 @@
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.example.OrderApi;
@@ -56,6 +58,8 @@ public class OrdersTest extends OrderApi {
     }
 
     @Test
+    @DisplayName("check Orders Response Body Test")
+    @Description("Проверяем Тело ответа, номер заказа")
     public void checkOrdersResponseBodyTest() {
         Orders orders = new Orders(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment);
 

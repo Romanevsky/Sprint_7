@@ -1,4 +1,6 @@
 import com.google.gson.Gson;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.example.*;
@@ -20,6 +22,8 @@ public class СourierTest extends CourierApi {
     }
 
     @Test
+    @DisplayName("check Courier Response Body Test")
+    @Description("Проверка создания курьера")
     public void checkCourierResponseBodyTest() {
 
         Courier courier = new Courier("romanyvsky", "romanev", "Roman");
@@ -31,6 +35,8 @@ public class СourierTest extends CourierApi {
     }
 
     @Test
+    @DisplayName("check Courier Double Response Body Test")
+    @Description("Проверка создания дублирующего курьера")
     public void checkCourierDoubleResponseBodyTest() {
         Courier courier = new Courier("romanyvsky", "romanev", "Roman");
 
@@ -51,6 +57,8 @@ public class СourierTest extends CourierApi {
     }
 
     @Test
+    @DisplayName("check Courier Response Without Field Body Test")
+    @Description("Проверка создания курьера без пароля")
     public void checkCourierResponseWithoutFieldBodyTest() {
         Courier courier = new Courier("romanyvsky", null, "Roman");
 

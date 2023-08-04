@@ -1,4 +1,6 @@
 import com.google.gson.Gson;
+import io.qameta.allure.Description;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.example.*;
@@ -23,6 +25,8 @@ public class OrdersCourierIdTest {
 
 
     @Test
+    @DisplayName("check Orders Response Body Test")
+    @Description("Проверяем Тело ответа, id заказа")
     public void checkOrdersResponseBodyTest() {
         Courier courier = new Courier("romanyvsky", "romanev", null);
 

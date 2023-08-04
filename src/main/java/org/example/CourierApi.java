@@ -1,6 +1,7 @@
 package org.example;
 
 import com.google.gson.Gson;
+import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
@@ -11,6 +12,7 @@ public class CourierApi {
     public final static String LOGIN_COURIER = "/api/v1/courier/login";
     static final String COURIER_S = "/api/v1/courier/%s";
 
+    @Step("Создание курьера")
     public Response createCourier(Courier courier) {
         return given()
                 .header("Content-type", "application/json")
@@ -19,7 +21,7 @@ public class CourierApi {
                 .when()
                 .post(COURIER);
     }
-
+    @Step("Авторизация курьера методом /api/v1/courier/login")
     public Response createCourierLogin(Courier courier) {
         return given()
                 .header("Content-type", "application/json")
@@ -28,7 +30,7 @@ public class CourierApi {
                 .when()
                 .post(LOGIN_COURIER);
     }
-
+    @Step("Удаление курьера")
     public void deleteCourier(String id) {
 
         Response responseDelete = given()
@@ -38,6 +40,7 @@ public class CourierApi {
 
     }
 
+    @Step("Вернуть id курьера")
     public CourierId getCourierId(Courier courier) {
 
         Response responseLogin = given()
